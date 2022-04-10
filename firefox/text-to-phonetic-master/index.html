@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Convert English to phonetic pronunciation">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>TextToPhonetic - Max Davy</title>
+
+    <!-- Tweaks for various OSs:-->
+    <!-- Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" type="image/png" href="/icons/apple-icon-precomposed.png" />
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Text to Phonetic - Max Davy">
+    <link rel="apple-touch-icon-precomposed" href="/icons/apple-icon-precomposed.png">
+
+    <!-- Windows -->
+    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#673ab7">
+    <meta name="theme-color" content="#673ab7">
+
+    <!-- Apple -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/styles/material.css" />
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        #view-source {
+            position: fixed;
+            display: block;
+            right: 0;
+            bottom: 0;
+            margin-right: 40px;
+            margin-bottom: 40px;
+            z-index: 900;
+        }
+    </style>
+    <script src="./minified/text-to-ipa-min.js"></script>
+    <script src="./minified/converter-form-min.js"></script>
+    <script>
+        function SelectText(element) {
+            document.getElementById(element).select();
+            document.execCommand('copy');
+        }
+    </script>
+    <script>
+        window.onload = TextToIPA.loadDict('./ipadict2.txt');
+    </script>
+</head>
+
+<body class="spectrum-background">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header mdl-layout__header--waterfall portfolio-header glass-element">
+            <a role="button" tabindex="0" class="mdl-layout__drawer-button" href="https://max-davy.github.io"><i class="material-icons">home</i></a>
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout__title">Text to Phonetic</span>
+            </div>
+        </header>
+
+        <main class="mdl-layout__content spectrum-background">
+            <div class="mdl-grid portfolio-max-width">
+                <div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--4dp glass-card">
+                    <div id="js-text-to-ipa-form" class="mdl-card__supporting-text">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="display: block;width:100%">
+                            <textarea class="mdl-textfield__input" type="text" rows="4" id="ipa-in"></textarea>
+                            <label class="mdl-textfield__label" for="ipa-in">Input Text Here</label>
+                        </div>
+                        <!--<textarea id="ipa-in" placeholder="Write text here!" rows="4" cols="50"></textarea>!-->
+                        <button style="display: block;" type="button" id="js-ipa-submit" onClick="ConverterForm.convert('ipa-in', 'ipa-out', 'ipa-err');if(document.getElementById('ipa-out').value){document.getElementById('outputLabel').style.visibility='hidden';}else{document.getElementById('outputLabel').style.visibility='visible';}"
+                            class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+                            Convert
+                        </button>
+                        <div class="mdl-tooltip" data-mdl-for="js-ipa-submit">
+                            Convert text to phonetic spelling
+                        </div>
+                        <!--<button type="button" id="js-ipa-submit" onClick="ConverterForm.convert('ipa-in', 'ipa-out', 'ipa-err')">Convert!</button>!-->
+                        <!--<textarea readonly id="ipa-out" placeholder="awtput gowz heer!" rows="4" cols="50"></textarea>!-->
+                        <div class="mdl-textfield mdl-js-textfield" style="display: block;width:100%" id="outputContainer">
+                            <textarea class="mdl-textfield__input" type="text" rows="4" id="ipa-out" readonly></textarea>
+                            <label class="mdl-textfield__label" for="ipa-out" id="outputLabel">Awtput Tekst Heer</label>
+                        </div>
+                        <button onclick="SelectText('ipa-out');" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" id="copybutton">
+                            Copy
+                        </button>
+                        <div class="mdl-tooltip" data-mdl-for="copybutton">
+                            Copy phonetic text to clipboard
+                        </div>
+                        <noscript><p style="color:red;">This converter will not work unless Javascript is enabled.</p></noscript>
+                        <div id="ipa-err" style="display: none;">
+                            <p>Errors will go here if you make any. (This will be overwritten!)</p>
+                        </div>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+                        <p>Enter text in the upper text field, click "Convert", and the phonetic equivalent appears in the lower text field. Click "Copy" to copy the output to clipboad.</p>
+                        <p>The phonetic dictionary was compiled from scratch from <a href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict" target="_blank">here</a> so there will be a few errors.<br>If you want to help fix these errors please feel free to submit
+                            pull requests to my <a href="https://github.com/max-davy/text-to-phonetic/" target="_blank">Github repository</a></p>
+                    </div>
+                </div>
+            </div>
+            <footer class="mdl-mini-footer" style="margin-top: 200px">
+                <div class="mdl-mini-footer__left-section">
+                    <div class="mdl-logo">© 2020 Max Davy</div>
+                    <div class="mdl-logo">View source on <a href="https://github.com/max-davy/text-to-phonetic/" target="_blank">Github</a></div>
+                </div>
+                <div class="mdl-mini-footer__right-section">
+                    <ul class="mdl-mini-footer__link-list">
+                        <li>Created using:</li>
+                        <li><a href="https://pages.github.com" target=_blank>Github Pages</a></li>
+                        <li><a href="https://getmdl.io" target="_blank">Material Design Lite</a></li>
+                        <li><a href="https://www.gitkraken.com" target="_blank">GitKraken</a></li>
+                        <li><a href="https://code.visualstudio.com" target="_blank">Visual Studio Code</a></li>
+                    </ul>
+                </div>
+            </footer>
+        </main>
+
+    </div>
+    <script src="/styles/material.js"></script>
+</body>
+
+</html>

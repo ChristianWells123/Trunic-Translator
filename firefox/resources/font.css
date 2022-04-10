@@ -1,0 +1,5 @@
+.use-trunic {
+    font-family: Trunic;
+    text-rendering: optimizeLegibility;
+    text-transform: none;
+}

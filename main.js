@@ -79,35 +79,40 @@ if (typeof TextToIPA !== 'object') {
 
   // Load the dictionary. Can be on the local machine or from a GET request.
   if (typeof TextToIPA.loadDict !== 'function') {
-    TextToIPA.loadDict = function (location) {
-      console.log('TextToIPA: Loading dict from ' + location + '...');
+    TextToIPA.loadDict = async function (location) {
+      return new Promise(resolve => {
+        console.log('TextToIPA: Loading dict from ' + location + '...');
 
-      if (typeof location !== 'string') {
-        console.log('TextToIPA Error: Location is not valid!');
-      } else {
+        if (typeof location !== 'string') {
+          console.log('TextToIPA Error: Location is not valid!');
+        } else {
 
-        var txtFile = new XMLHttpRequest();
+          var txtFile = new XMLHttpRequest();
 
-        txtFile.open('GET', location, true);
+          txtFile.open('GET', location, true);
 
-        txtFile.onreadystatechange = function () {
-          // If document is ready to parse...
-          if (txtFile.readyState == 4) {
-            // And file is found...
-            if (txtFile.status == 200 || txtFile.status == 0) {
-              // Load up the ipa dict
-              TextToIPA._parseDict(txtFile.responseText.split('\n'));
-              replaceRecursively(document.body)
-            }
-          }
-        };
+          txtFile.onreadystatechange = async function () {
+            // If document is ready to parse...
+            return new Promise(resolve => {
+              if (txtFile.readyState == 4) {
+                // And file is found...
+                if (txtFile.status == 200 || txtFile.status == 0) {
+                  // Load up the ipa dict
+                  TextToIPA._parseDict(txtFile.responseText.split('\n'));
+                  replaceWithinAsync(document.body)
+                }
+              }
+            });
+          };
 
-        txtFile.send(null);
+          txtFile.send(null);
 
 
-      }
+        }
 
-    };
+      });
+
+    }
 
   }
 
@@ -201,32 +206,40 @@ function replaceWithIPA(string) {
 
 }
 
-function replaceRecursively(element) {
-  element.innerHTML = element.innerHTML.replace(/(?<!(<\/?[^>]*|&[^;]*))([^\s<]+)/g, '$1<span class="translate-to-ipa">$2</span>');
-  spans = document.getElementsByClassName("translate-to-ipa")
+var replaceTextWithin = function (element) {
 
-  Array.prototype.forEach.call(spans, function (element) {
-    currText = element.textContent
-    replacedText = replaceWithIPA(currText.toLowerCase());
-    if (replacedText.err == "undefined") {
-      element.classList.add("exclude-trunic");
-    } else {
-      element.textContent = replacedText.text;
-      element.classList.add("use-trunic");
+  return new Promise(resolve => {
+
+    element.innerHTML = element.innerHTML.replace(/(?<!(<\/?[^>]*|&[^;]*))([^\s<]+)/g, '$1<span class="translate-to-ipa">$2</span>');
+    spans = document.getElementsByClassName("translate-to-ipa")
+
+    Array.prototype.forEach.call(spans, function (element) {
+      currText = element.textContent
+      replacedText = replaceWithIPA(currText.toLowerCase());
+      if (replacedText.err == "undefined") {
+        element.classList.add("exclude-trunic");
+      } else {
+        element.textContent = replacedText.text;
+        element.classList.add("use-trunic");
+      }
+      //element.classList.remove("translate-to-ipa");
+    });
+    html = element.innerHTML;
+    var htmlLength = 0;
+    while (htmlLength != html.length) {
+      htmlLength = html.length;
+      html = html.replace(/(<span[^<>]*>)([\s\S]*?)(<\/span>)(\s*)\1([\s\S]*?)\3/gi, "$1$2$4$5$3");
     }
-    //element.classList.remove("translate-to-ipa");
-  });
-  html = element.innerHTML;
-  var htmlLength = 0;
-  while (htmlLength != html.length) {
-    htmlLength = html.length;
-    html = html.replace(/(<span[^<>]*>)([\s\S]*?)(<\/span>)(\s*)\1([\s\S]*?)\3/gi, "$1$2$4$5$3");
-  }
-  Array.from(document.querySelectorAll('.translate-to-ipa')).forEach(function (el) {
-    el.classList.remove('translate-to-ipa');
-  });
+    Array.from(document.querySelectorAll('.translate-to-ipa')).forEach(function (el) {
+      el.classList.remove('translate-to-ipa');
+    });
 
+  });
 };
+
+var replaceWithinAsync = async function (element) {
+  replaceTextWithin(element);
+}
 
 function startsWithVowel(word) {
   var vowels = ("aeiouAEIOU\u00e6\u0251\u0065\u0329\u0259\u026a\u025c\u028a");
@@ -271,33 +284,6 @@ function replaceWithIPA(string) {
   return { text: out, err: error };
 
 }
-
-var replaceRecursively = function (element) {
-  element.innerHTML = element.innerHTML.replace(/(?<!(<\/?[^>]*|&[^;]*))([^\s<]+)/g, '$1<span class="translate-to-ipa">$2</span>');
-  spans = document.getElementsByClassName("translate-to-ipa")
-
-  Array.prototype.forEach.call(spans, function (element) {
-    currText = element.textContent
-    replacedText = replaceWithIPA(currText.toLowerCase());
-    if (replacedText.err == "undefined") {
-      element.classList.add("exclude-trunic");
-    } else {
-      element.textContent = replacedText.text;
-      element.classList.add("use-trunic");
-    }
-    //element.classList.remove("translate-to-ipa");
-  });
-  html = element.innerHTML;
-  var htmlLength = 0;
-  while (htmlLength != html.length) {
-    htmlLength = html.length;
-    html = html.replace(/(<span[^<>]*>)([\s\S]*?)(<\/span>)(\s*)\1([\s\S]*?)\3/gi, "$1$2$4$5$3");
-  }
-  Array.from(document.querySelectorAll('.translate-to-ipa')).forEach(function (el) {
-    el.classList.remove('translate-to-ipa');
-  });
-
-};
 
 /* 
 function replaceRecursively(element) {
